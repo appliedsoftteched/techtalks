@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: springbootonkubernetes
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: springbootonkubernetes
+  template:
+    metadata:
+      labels:
+        app: springbootonkubernetes
+    spec:
+      containers:
+        - name: app
+          image: rahulopengts/springbootonkubernetes:1.0
+          ports:
+            - containerPort: 8080
+          imagePullPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: springbootonkubernetes
+spec:
+  selector:
+    app: springbootonkubernetes
+  ports:
+    - port: 8080
+      targetPort: 8080
+  type: NodePort
