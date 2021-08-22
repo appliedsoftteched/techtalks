@@ -1,0 +1,43 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: react-ui
+  labels:
+    app: react-ui
+spec:
+  selector:
+    app: react-ui
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8080
+  type: LoadBalancer
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: react-ui
+  labels:
+    app: react-ui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: react-ui
+  template:
+    metadata:
+      labels:
+        app: react-ui
+      annotations:
+        dapr.io/enabled: "true"
+        dapr.io/app-id: "react-ui"
+        dapr.io/app-port: "8080"
+        
+    spec:
+      containers:
+      - name: react-ui
+        image: rahulopengts/react-ui:2.0
+        ports:
+        - containerPort: 8080
+        imagePullPolicy: Always

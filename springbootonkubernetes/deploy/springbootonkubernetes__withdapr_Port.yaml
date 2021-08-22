@@ -1,0 +1,42 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: springbootonkubernetes
+  labels:
+    app: springbootonkubernetes
+spec:
+  selector:
+    app: springbootonkubernetes
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8082
+  type: LoadBalancer
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: springbootonkubernetes
+  labels:
+    app: springbootonkubernetes
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: springbootonkubernetes
+  template:
+    metadata:
+      labels:
+        app: springbootonkubernetes
+      annotations:
+        dapr.io/enabled: "true"
+        dapr.io/app-id: "springbootonkubernetes"
+        dapr.io/app-port: "8082"        
+    spec:
+      containers:
+      - name: springbootonkubernetes
+        image: rahulopengts/springbootonkubernetes:2.0
+        ports:
+        - containerPort: 8082
+        imagePullPolicy: Always

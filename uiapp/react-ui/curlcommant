@@ -1,0 +1,2 @@
+curl -H "Content-Type: application/json" --data @dbody.json http://localhost:8082/neworder
+{"id":1,"content":""}

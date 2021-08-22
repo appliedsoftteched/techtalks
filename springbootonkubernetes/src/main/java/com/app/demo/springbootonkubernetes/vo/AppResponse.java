@@ -6,7 +6,7 @@ public class AppResponse implements Serializable{
 
 
 	private final long id;
-	private final String content;
+	private String content;
 
 	public AppResponse(long id, String content) {
 		this.id = id;
@@ -19,5 +19,9 @@ public class AppResponse implements Serializable{
 
 	public String getContent() {
 		return content;
+	}
+	
+	public void setContent(String p_content) {
+		content	=	p_content;
 	}
 }

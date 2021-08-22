@@ -1,0 +1,148 @@
+Spring on Kubernetes
+
+clone repo https://github.com/appliedsoftteched/techtalks.git
+Start powershell with admin mode	
+$host.ui.RawUI.WindowTitle = “Spring Boot On Kubernetes”
+$Env:PATH+=";D:\knowledgebase\dapr\kubctl;D:\knowledgebase\dapr\minikube;D:\knowledgebase\dapr\dapr;"
+$Env:MINIKUBE_HOME="D:\knowledgebase\dapr\minikube\minikubehome"
+$Env:JAVA_HOME="D:\jdk8_91"
+$Env:PATH+=";D:\jdk8_91\bin;"
+.\mvnw spring-boot:build-image
+docker login -u rahulopengts
+docker build --file=Dockerfile --tag=rahulopengts/springbootonkubernetes:2.0 --rm=true .
+docker push rahulopengts/springbootonkubernetes:2.0
+kubectl delete -n default service springbootonkubernetes
+kubectl delete -n default deployment springbootonkubernetes
+kubectl.exe apply -f .\deploy\springbootonkubernetes__withdapr_Port.yaml
+kubectl rollout status deploy/springbootonkubernetes
+kubectl port-forward service/springbootonkubernetes 8080:80
+http://localhost:8080/springbootkubernetes/greeting?name=TESTMESSAGE
+
+kubectl logs springbootonkubernetes-547747db9f-txqhc daprd >> successdeploylog.txt
+kubectl.exe logs springbootonkubernetes-547747db9f-d88d6
+
+-------------------------NODEAPP--------------------------
+
+docker build --file=Dockerfile --tag=rahulopengts/hello-k8s-node:latest --rm=true .
+docker push rahulopengts/hello-k8s-node:latest
+kubectl delete -n default service nodeapp
+kubectl delete -n default deployment nodeapp
+kubectl.exe apply -f .\deploy\node.yaml
+kubectl rollout status deploy/nodeapp
+kubectl port-forward service/nodeapp 8080:80
+
+kubectl create clusterrolebinding cluster-system-anonymous --clusterrole=cluster-admin --user=system:anonymous
+
+https://developers.redhat.com/articles/2021/08/12/build-and-deploy-microservices-kubernetes-and-dapr#build_a_sample_application_in_node_js
+https://docs.dapr.io/operations/troubleshooting/common_issues/
+
+
+READ ON HELLO KUBERNETES
+https://www.freshbrewed.science/dapr-getting-started/index.html
+
+$Env:DAPR_HTTP_PORT
+
+OBSERVATIONS FOR NODE APP
+
+1. EXPOSE PORT IN DOCKER FILE AND THE app-port IN THE YAML should BE SAME
+    ALso refer 
+    https://docs.dapr.io/reference/arguments-annotations-overview/
+    for details of annotation
+    
+2. In docker k8 mode, Dapr car is always on 3500 port and no need to change
+
+    Service port to dapr(3500) and dapr to container ( should be same as EXPOSE / APP PORT )
+    IF EXPOSE PORT AND APP PORT ARE NOT SAME THEN POD DOES NOT START
+
+
+Service-port: 80 (Port Forwarding to this)
+----->DAPR DEFAULT PORT of 3500
+----->DAPR TO 
+        annotations:
+                dapr.io/enabled: "true"
+                dapr.io/app-id: "nodeapp"
+                dapr.io/app-port: "3100"
+
+------>Container PORT ()
+------>Container To EXPOSE PORT IN DOCKER
+------>EXPOSE PORT TO APPLICATION PORT SHOULD BE SAME
+v1.0/invoke/nodeapp/method/neworder
+
+curl -XPOST -d @sample.json -H Content-Type:application/json http://localhost:3500/v1.0/invoke/nodeapp/method/neworder
+dapr invoke --app-id nodeapp --method neworder --data-file sample.json
+
+--------------------LOGS--------------------------------------
+kubectl logs nodeapp-5d5dc88584-g7q5v daprd
+
+USE THIS TO SEE RUNTIME LOGS "node" is app name is node.yaml (app: node)
+kubectl logs --selector=app=node -c node --tail=-1
+--------------------LOGS--------------------------------------
+
+
+
+--------------------------------------------------PYTHONAPP------------------------------------------------------------
+
+docker build --file=Dockerfile --tag=rahulopengts/hello-k8s-python:latest --rm=true .
+docker push rahulopengts/hello-k8s-python:latest
+
+docker build -t hello-k8s-python .
+docker push rahulopengts/hello-k8s-python:1.0
+kubectl delete -n default deployment pythonapp
+
+kubectl.exe apply -f .\deploy\python.yaml
+kubectl rollout status deploy/pythonapp
+kubectl logs --selector=app=springbootonkubernetes -c springbootonkubernetes --tail=-1
+
+kubectl.exe logs pythonapp-54876fc6db-rl5k5 python
+
+docker rmi rahulopengts/hello-k8s-python:1.0
+docker rmi 2af10ce7b344
+-----------------------------------------------------------------------------------------------------------------------
+
+
+-------------------------COMMANDS AT START------------
+Set-ExecutionPolicy RemoteSigned
+$Env:MINIKUBE_HOME="D:\knowledgebase\dapr\minikube\minikubehome"
+$Env:PATH+=";d:\software_installed\python38\Scripts;d:\software_installed\python38;"
+$Env:PATH+=";D:\software_installed\node-v14.15.4-win-x64;"
+$Env:PATH+=";D:\knowledgebase\dapr\kubctl;D:\knowledgebase\dapr\minikube;D:\knowledgebase\dapr\dapr;"
+
+$Env:PATH+=";D:\apache-maven-3.3.1\bin"
+$Env:MAVEN_HOME="d:\apache-maven-3.3.1"
+$Env:MAVEN_OPTS="-Xms512m -Xmx1024m -XX:PermSize=256m -XX:MaxPermSize=512m"
+
+
+
+
+
+
+
+
+
+
+JAVA DEPLOYMENT ON KUBERNETES
+https://www.oreilly.com/content/how-to-manage-docker-containers-in-kubernetes-with-java/
+
+
+-------------------DAPR COMMANDS-------------
+dapr list -k
+
+
+
+
+----UI------------
+npm install
+npm run buildclient
+
+
+got to react-calculator
+npm run buildclient
+docker build --file=Dockerfile --tag=rahulopengts/react-ui:2.0 --rm=true .
+docker push rahulopengts/react-ui:2.0
+kubectl delete -n default service react-ui
+kubectl delete -n default deployment react-ui
+cd..
+kubectl.exe apply -f .\deploy\react-ui.yaml
+kubectl rollout status deploy/react-ui
+kubectl port-forward service/react-ui 8080:80
+kubectl logs react-ui-547747db9f-txqhc react-ui

@@ -1,0 +1,42 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: springbootonkubernetes
+  labels:
+    app: node
+spec:
+  selector:
+    app: node
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 3000
+  type: LoadBalancer
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: springbootonkubernetes
+  labels:
+    app: node
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: node
+  template:
+    metadata:
+      labels:
+        app: node
+      annotations:
+        dapr.io/enabled: "true"
+        dapr.io/app-id: "springbootonkubernetes"
+        dapr.io/app-port: "3000"
+    spec:
+      containers:
+      - name: node
+        image: rahulopengts/springbootonkubernetes:1.0
+        ports:
+        - containerPort: 8082
+        imagePullPolicy: Always

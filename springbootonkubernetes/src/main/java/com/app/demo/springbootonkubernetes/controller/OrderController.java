@@ -1,5 +1,3 @@
-
-
 package com.app.demo.springbootonkubernetes.controller;
 
 import java.util.concurrent.atomic.AtomicLong;
@@ -17,44 +15,39 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.app.demo.springbootonkubernetes.vo.AppRequest;
 import com.app.demo.springbootonkubernetes.vo.AppResponse;
-import com.app.demo.springbootonkubernetes.vo.RequestData;
+import com.app.demo.springbootonkubernetes.vo.OrderDetailVO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RestController
-public class GreetingController {
+public class OrderController {
 
 	private static final String template = "YES HELLO, %s!";
-	private final AtomicLong counter = new AtomicLong();
-	Logger logger	=	LoggerFactory.getLogger(GreetingController.class);
 	
-	@GetMapping("/greeting")
-	public AppResponse greeting(@RequestParam(value = "name", defaultValue = "World") String name) {
-		return new AppResponse(counter.incrementAndGet(), String.format(template, name));
-	}
+	Logger logger	=	LoggerFactory.getLogger(OrderController.class);
 	
-	@GetMapping("/ports")
-	public String ports() {
-		return "Reponse Fomr Service";
-	}
+	
 
 	
-	@RequestMapping(value = "/neworder", method = RequestMethod.POST)
-	public ResponseEntity<AppResponse> saveNewOrder(@RequestBody AppRequest data) {
+	@RequestMapping(value = "/orderbook", method = RequestMethod.POST)
+	public ResponseEntity<AppResponse> saveNewOrder(@RequestBody OrderDetailVO order) {
 		//System.out.println("New Order Request "+data);
-		logger.info("LLLLGot the in neworder as "+data);
+		String response	=	"";
+		logger.info("Got the details for new order "+order);
 		ObjectMapper mapper = new ObjectMapper();
 		try {
-			String jsonInString = mapper.writeValueAsString(data);
+			String jsonInString = mapper.writeValueAsString(order);
 			logger.info("Got the JSON  "+jsonInString);
 		} catch (JsonProcessingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		response	=	"Thank your for your order for "+order.getPublisher();
 		
-		AppResponse res	=	new AppResponse(1,data.getData()+" data ");
-		res.setContent("");
+		AppResponse res	=	new AppResponse(1,response);
+		
 		return new ResponseEntity<AppResponse>(res, HttpStatus.OK);
 
 	}
+
 }
