@@ -1,4 +1,0 @@
-FROM openjdk:11
-MAINTAINER rahulopengts.com
-COPY target/governor-app-exec.jar governor-app-2.0.jar
-ENTRYPOINT ["java","-jar","/governor-app-2.0.jar"]
